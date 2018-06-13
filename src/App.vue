@@ -1,13 +1,15 @@
 <template>
-  <div id="app">
+<div>
+  <div class="loading" v-if="!readyForRender"><i class="el-icon-loading"></i></div>
+  <div id="app" v-if="readyForRender">
     <!-- mobile -->
-    <nav class="navbar navbar-dark d-md-none">
+    <nav class="navbar navbar-dark d-md-none fixed-top">
       <div class="container">
         <img src="./assets/logo.svg" alt="" class="navbar-brand mr-auto ml-auto">
       </div>
     </nav>
     <!-- desktop and pad -->
-    <nav class="navbar navbar-dark d-none d-md-block">
+    <nav class="navbar navbar-dark d-none d-md-block fixed-top">
       <div class="container">
         <div class="row">
           <div class="col-md-5 col-lg-3">
@@ -19,7 +21,7 @@
         </div>
       </div>
     </nav>
-    <div class="container">
+    <div class="container main">
       <div class="row">
         <!-- mobile -->
         <div class="col d-md-none bg-white pb-3">
@@ -66,41 +68,52 @@
             </div>
           </div>
         </div>
-        <div class="col-md-7 col-lg-9 pt-4">
-          <el-tag
-            :key="tag"
-            v-for="tag in dynamicTags"
-            closable
-            :disable-transitions="false"
-            @close="handleClose(tag)">
-            {{tag}}
-          </el-tag>
-          
-          <div class="mt-3">
-            <Site class="hover mb-4" style="cursor: pointer;"/>
-            <Site class="hover mb-4" style="cursor: pointer;"/>
+        <div class="col-md-7 col-lg-9 pt-4 pb-4">
+          <div class="mb-3">
+            <el-tag
+              :key="tag"
+              v-for="tag in dynamicTags"
+              closable
+              :disable-transitions="false"
+              @close="handleClose(tag)">
+              {{tag}}
+            </el-tag>
           </div>
+          <div v-for="item in searchData" :key="item.key">
+            <Site class="hover mb-4" style="cursor: pointer;" :item="item"/>
+          </div>
+          <el-pagination
+            class="mb-3"
+            background
+            layout="prev, pager, next"
+            :total="data.length">
+          </el-pagination>
         </div>
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
 import Site from './components/Site'
+import axios from 'axios'
 
 export default {
   name: 'app',
   data() {
     return {
+      readyForRender: false,
       searchInput: '',
-      startDate: '',
-      endDate: '',
       activeNames: [],
-      selectedLocation: '',
+      selectedLocation: '全部',
       freeTicket: true,
       open: false,
       locations: [
+        {
+          value: '全部',
+          label: '全部'
+        },
         {
           value: '楠梓區',
           label: '楠梓區'
@@ -147,15 +160,77 @@ export default {
         }
       ],
       dynamicTags: ['免費參觀'],
-      data: null
+      res: null
     };
   },
   mounted() {
     axios.get('https://data.kcg.gov.tw/api/action/datastore_search?resource_id=92290ee5-6e61-456f-80c0-249eae2fcc97')
     .then(res => {
-      this.data = res;
+      this.res = res;
+      this.readyForRender = true;
     })
     .catch(error => console.log(error))
+  },
+  computed: {
+    data() {
+      const res = this.res.data.result.records
+      let result = [];
+      if (this.freeTicket === true && this.open === true) {
+        res.forEach(e => {
+          if (e.Ticketinfo === '免費參觀' && e.Opentime === '全天候開放') {
+            result.push(e);
+          }
+        })
+      }
+      else if (this.freeTicket === true && this.open === false) {
+        res.forEach(e => {
+          if (e.Ticketinfo === '免費參觀') {
+            result.push(e);
+          }
+        })
+      }
+      else if (this.freeTicket === false && this.open === true) {
+        res.forEach(e => {
+          if (e.Opentime === '全天候開放') {
+            result.push(e);
+          }
+        })
+      }
+      else {
+        result = res;
+      }
+      return result;
+    },
+    sortData() {
+      if (this.selectedLocation === '全部') {
+        return this.data;
+      }
+      else {
+        let result = []
+        const self = this;
+        this.data.forEach(e => {
+          if (e.Zone === self.selectedLocation) {
+            result.push(e);
+          }
+        })
+        return result;
+      }
+    },
+    searchData() {
+      if (this.searchInput === '') {
+        return this.sortData;
+      }
+      else {
+        let result = []
+        const self = this;
+        this.sortData.forEach(e => {
+          if (e.Name.match(self.searchInput) !== null) {
+            result.push(e);
+          }
+        })
+        return result;
+      }
+    }
   },
   methods: {
     handleClose(tag) {
@@ -188,5 +263,32 @@ export default {
 }
 .hover:hover {
   box-shadow: 0 0 11px rgba(33,33,33,.2); 
+}
+.loading {
+  margin-right: auto;
+  margin-left: auto;
+  width: 60px;
+  margin-top: 250px;
+}
+.loading i {
+  font-size: 50px;
+  color: #31BDC8;
+}
+.el-pager {
+  .number {
+    background-color: #fff !important;
+  }
+  .active {
+    background-color: #31BDC8 !important;
+  }
+}
+.btn-prev, .btn-next, .btn-quicknext {
+  background-color: #fff !important;
+}
+.main {
+  padding-top: 50px;
+  @media (min-width: 768px) {
+    padding-top: 80px;
+  }
 }
 </style>
