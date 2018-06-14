@@ -5,7 +5,7 @@
     <!-- mobile -->
     <nav class="navbar navbar-dark d-md-none fixed-top">
       <div class="container">
-        <img src="https://i.imgur.com/7lsFP0P.png" alt="" class="navbar-brand mr-auto ml-auto">
+        <img src="https://i.imgur.com/7lsFP0P.png" alt="" class="" style="width: 150px; height: 25px;">
       </div>
     </nav>
     <!-- desktop and pad -->
