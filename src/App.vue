@@ -24,7 +24,7 @@
     <div class="container main">
       <div class="row">
         <!-- mobile -->
-        <div class="col d-md-none bg-white pb-3">
+        <div class="col d-md-none bg-white pb-3" v-if="!isClick">
           <el-input class="mt-3 mb-3" v-model="searchInput" placeholder="搜尋地點..." prefix-icon="el-icon-search"></el-input>
           <el-collapse v-model="activeNames">
             <el-collapse-item title="地點" name="地點">
@@ -68,7 +68,8 @@
             </div>
           </div>
         </div>
-        <div class="col-md-7 col-lg-9 pt-4 pb-4">
+        <!-- list -->
+        <div class="col-md-7 col-lg-9 pt-4 pb-4" v-if="!isClick">
           <div class="mb-3" v-if="freeTicket === true || open === true || selectedLocation !== '全部'">
             <el-tag
               :key="tag"
@@ -88,14 +89,18 @@
             </el-tag>
           </div>
           <div v-for="item in searchData" :key="item.key">
-            <Site class="hover mb-4" style="cursor: pointer;" :item="item"/>
+            <div @click="sendInfo(item)">
+              <Site class="hover mb-4" style="cursor: pointer;" :item="item"/>
+            </div>
           </div>
-          <!-- <el-pagination
-            class="mb-3"
-            background
-            layout="prev, pager, next"
-            :total="data.length">
-          </el-pagination> -->
+        </div>
+
+        <!-- detail -->
+        <div class="col-md-7 col-lg-9 pt-4 pb-4" v-if="isClick">
+          <div class="container mb-3">
+            <el-button @click="back" size="small">回到上一頁</el-button>
+          </div>
+          <Detail :detailInfo="detailInfo"/>
         </div>
       </div>
     </div>
@@ -108,6 +113,7 @@
 
 <script>
 import Site from './components/Site'
+import Detail from './components/Detail'
 import axios from 'axios'
 
 export default {
@@ -170,7 +176,9 @@ export default {
           label: '小港區'
         }
       ],
-      res: null
+      res: null,
+      isClick: false,
+      detailInfo: {}
     };
   },
   mounted() {
@@ -275,10 +283,18 @@ export default {
       else {
         this.selectedLocation = '全部';
       }
+    },
+    sendInfo(item) {
+      this.detailInfo = item;
+      this.isClick = true;
+    },
+    back() {
+      this.isClick = false;
     }
   },
   components: {
-    Site
+    Site,
+    Detail
   }
 };
 </script>
@@ -332,6 +348,6 @@ export default {
   }
 }
 button:focus {
-  outline-width: 0;
+  outline: 0px !important;
 }
 </style>
