@@ -5,7 +5,7 @@
     <!-- mobile -->
     <nav class="navbar navbar-dark d-md-none fixed-top">
       <div class="container">
-        <img src="./assets/logo.svg" alt="" class="navbar-brand mr-auto ml-auto">
+        <img src="https://i.imgur.com/7lsFP0P.png" alt="" class="navbar-brand mr-auto ml-auto">
       </div>
     </nav>
     <!-- desktop and pad -->
@@ -13,7 +13,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md-5 col-lg-3">
-            <img src="./assets/logo.svg" alt="" class="navbar-brand ml-3">
+            <img src="https://i.imgur.com/7lsFP0P.png" alt="" class="navbar-brand ml-3">
           </div>
         </div>
         <div class="col-md-7 col-lg-9">
@@ -115,6 +115,7 @@
 import Site from './components/Site'
 import Detail from './components/Detail'
 import axios from 'axios'
+import logo from './assets/logo.svg'
 
 export default {
   name: 'app',
