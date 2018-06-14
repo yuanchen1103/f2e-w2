@@ -69,10 +69,18 @@
           </div>
         </div>
         <div class="col-md-7 col-lg-9 pt-4 pb-4">
-          <div class="mb-3">
+          <div class="mb-3" v-if="freeTicket === true || open === true || selectedLocation !== '全部'">
             <el-tag
               :key="tag"
               v-for="tag in dynamicTags"
+              closable
+              :disable-transitions="false"
+              @close="handleClose(tag)">
+              {{tag}}
+            </el-tag>
+            <el-tag
+              :key="tag"
+              v-for="tag in locationTags"
               closable
               :disable-transitions="false"
               @close="handleClose(tag)">
@@ -82,16 +90,19 @@
           <div v-for="item in searchData" :key="item.key">
             <Site class="hover mb-4" style="cursor: pointer;" :item="item"/>
           </div>
-          <el-pagination
+          <!-- <el-pagination
             class="mb-3"
             background
             layout="prev, pager, next"
             :total="data.length">
-          </el-pagination>
+          </el-pagination> -->
         </div>
       </div>
     </div>
   </div>
+  <back-to-top text="Back to top" visibleoffset="300">
+    <el-button type="primary" icon="el-icon-caret-top"></el-button>
+  </back-to-top>
 </div>
 </template>
 
@@ -159,7 +170,6 @@ export default {
           label: '小港區'
         }
       ],
-      dynamicTags: ['免費參觀'],
       res: null
     };
   },
@@ -172,6 +182,28 @@ export default {
     .catch(error => console.log(error))
   },
   computed: {
+    dynamicTags() {
+      if (this.freeTicket === true && this.open === true) {
+        return ['免費參觀', '全天候開放'];
+      }
+      else if (this.freeTicket === true && this.open === false) {
+        return ['免費參觀'];
+      }
+      else if (this.freeTicket === false && this.open === true) {
+        return ['全天候開放'];
+      }
+      else {
+        return [];
+      }
+    },
+    locationTags() {
+      if (this.selectedLocation === '全部') {
+        return [];
+      }
+      else {
+        return [this.selectedLocation];
+      }
+    },
     data() {
       const res = this.res.data.result.records
       let result = [];
@@ -234,7 +266,15 @@ export default {
   },
   methods: {
     handleClose(tag) {
-      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+      if (tag === '免費參觀') {
+        this.freeTicket = false;
+      }
+      else if (tag === '全天候開放') {
+        this.open = false;
+      }
+      else {
+        this.selectedLocation = '全部';
+      }
     }
   },
   components: {
@@ -290,5 +330,8 @@ export default {
   @media (min-width: 768px) {
     padding-top: 80px;
   }
+}
+button:focus {
+  outline-width: 0;
 }
 </style>
