@@ -115,7 +115,7 @@
 import Site from './components/Site'
 import Detail from './components/Detail'
 import axios from 'axios'
-import logo from './assets/logo.svg'
+import json from './data.json'
 
 export default {
   name: 'app',
@@ -177,18 +177,19 @@ export default {
           label: '小港區'
         }
       ],
-      res: null,
+      res: json,
       isClick: false,
       detailInfo: {}
     };
   },
   mounted() {
-    axios.get('https://data.kcg.gov.tw/api/action/datastore_search?resource_id=92290ee5-6e61-456f-80c0-249eae2fcc97')
-    .then(res => {
-      this.res = res;
-      this.readyForRender = true;
-    })
-    .catch(error => console.log(error))
+    // axios.get('https://data.kcg.gov.tw/api/action/datastore_search?resource_id=92290ee5-6e61-456f-80c0-249eae2fcc97')
+    // .then(res => {
+    //   this.res = res;
+    //   this.readyForRender = true;
+    // })
+    // .catch(error => console.log(error))
+    this.readyForRender = true;
   },
   computed: {
     dynamicTags() {
@@ -214,7 +215,7 @@ export default {
       }
     },
     data() {
-      const res = this.res.data.result.records
+      const res = this.res.result.records
       let result = [];
       if (this.freeTicket === true && this.open === true) {
         res.forEach(e => {
